@@ -1,0 +1,18 @@
+package com.onghub.api.dto.response;
+
+import java.time.Instant;
+
+public record ApiResponse<T>(
+    boolean success,
+    T data,
+    String message,
+    Instant timestamp
+) {
+    public static <T> ApiResponse<T> success(T data, String message) {
+        return new ApiResponse<>(true, data, message, Instant.now());
+    }
+
+    public static ApiResponse<Void> successMessage(String message) {
+        return new ApiResponse<>(true, null, message, Instant.now());
+    }
+}
