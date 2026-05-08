@@ -45,6 +45,9 @@ class NgoControllerTest {
             null,
             null,
             null,
+            null,
+            null,
+            null,
             NgoStatus.ACTIVE,
             10L,
             null,
@@ -68,12 +71,18 @@ class NgoControllerTest {
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
         );
 
         NgoResponse response = new NgoResponse(
             1L,
             "ONG",
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -101,6 +110,9 @@ class NgoControllerTest {
         NgoResponse response = new NgoResponse(
             1L,
             "ONG",
+            null,
+            null,
+            null,
             null,
             null,
             null,

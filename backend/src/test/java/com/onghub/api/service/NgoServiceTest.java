@@ -58,6 +58,9 @@ class NgoServiceTest {
             null,
             "ong@test.com",
             null,
+            null,
+            null,
+            null,
             null
         );
 
@@ -82,6 +85,9 @@ class NgoServiceTest {
 
         NgoRegisterRequest request = new NgoRegisterRequest(
             "ONG X",
+            null,
+            null,
+            null,
             null,
             null,
             null,

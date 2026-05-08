@@ -137,6 +137,10 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = storedToken.getUser();
+        if (user.getDeletedAt() != null) {
+            throw new TokenExpiredException("Refresh token expired");
+        }
+
         String accessToken = jwtUtil.generateAccessToken(user);
         String newRefreshToken = createRefreshToken(user).getToken();
         UserResponse userResponse = userMapper.toResponse(user);

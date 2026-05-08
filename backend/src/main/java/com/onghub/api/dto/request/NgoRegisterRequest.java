@@ -12,6 +12,9 @@ public record NgoRegisterRequest(
     @Size(max = 30) String phone,
     @Size(max = 255) String website,
     @Email String email,
+    @Size(max = 512) String logoUrl,
+    String socialLinks,
+    String certifications,
     Long categoryId,
     @Valid AddressRequest address
 ) {

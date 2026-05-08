@@ -112,4 +112,9 @@ rawClient.interceptors.response.use(
 
 const apiClient = rawClient as unknown as ApiClient
 
+/** Authenticated binary GET (PDF/CSV). Uses the same JWT interceptors as JSON calls. */
+export async function getAuthenticatedBlob(url: string): Promise<Blob> {
+  return rawClient.get(url, { responseType: 'blob' }) as Promise<Blob>
+}
+
 export default apiClient

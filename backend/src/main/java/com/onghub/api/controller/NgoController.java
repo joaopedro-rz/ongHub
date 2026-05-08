@@ -29,19 +29,31 @@ public class NgoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','ONG_MANAGER')")
     public ResponseEntity<ApiResponse<NgoResponse>> register(@Valid @RequestBody NgoRegisterRequest request, Principal principal) {
         NgoResponse created = ngoService.registerNgo(principal.getName(), request);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success(created, "ONG cadastrada"));
     }
 
+    @GetMapping("/public")
+    public ResponseEntity<ApiResponse<Page<NgoSummaryResponse>>> listPublic(
+        Pageable pageable,
+        @RequestParam(required = false) Long categoryId,
+        @RequestParam(required = false) String search
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(ngoService.listPublic(pageable, categoryId, search), "Lista publica de ONGs"));
+    }
+
     @GetMapping
     public ResponseEntity<ApiResponse<Page<NgoSummaryResponse>>> list(
         Pageable pageable,
         @RequestParam(required = false) String managerEmail,
-        @RequestParam(required = false) NgoStatus status
+        @RequestParam(required = false) NgoStatus status,
+        @RequestParam(required = false) Long categoryId,
+        @RequestParam(required = false) String search
     ) {
-        return ResponseEntity.ok(ApiResponse.success(ngoService.list(pageable, managerEmail, status), "Lista de ONGs"));
+        return ResponseEntity.ok(ApiResponse.success(ngoService.list(pageable, managerEmail, status, categoryId, search), "Lista de ONGs"));
     }
 
     @GetMapping("/{id}")
@@ -50,6 +62,7 @@ public class NgoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','ONG_MANAGER')")
     public ResponseEntity<ApiResponse<NgoResponse>> update(
         @PathVariable Long id,
         @Valid @RequestBody NgoUpdateRequest request,

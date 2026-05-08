@@ -15,6 +15,11 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiError> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+        return buildError(ErrorCode.VALIDATION_ERROR, ex.getMessage(), request, HttpStatus.BAD_REQUEST, List.of());
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
         return buildError(ErrorCode.RESOURCE_NOT_FOUND, ex.getMessage(), request, HttpStatus.NOT_FOUND, List.of());

@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { AuthLayout } from '../../../components/shared/AuthLayout'
 import { Button } from '../../../components/ui/Button'
@@ -26,6 +27,7 @@ const roles: { label: string; value: AuthRole }[] = [
 ]
 
 export function RegisterPage() {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -42,6 +44,7 @@ export function RegisterPage() {
     mutationFn: authApi.register,
     onSuccess: () => {
       showToast('success', 'Cadastro realizado com sucesso')
+      navigate('/app', { replace: true })
     },
     onError: (error: unknown) => {
       const applied = applyApiFieldErrors<FormValues>(error, setError)

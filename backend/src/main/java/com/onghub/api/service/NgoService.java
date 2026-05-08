@@ -11,7 +11,9 @@ import org.springframework.data.domain.Pageable;
 public interface NgoService {
     NgoResponse registerNgo(String managerEmail, NgoRegisterRequest request);
 
-    Page<NgoSummaryResponse> list(Pageable pageable, NgoStatus status, Long categoryId, String search);
+    Page<NgoSummaryResponse> list(Pageable pageable, String managerEmail, NgoStatus status, Long categoryId, String search);
+
+    Page<NgoSummaryResponse> listPublic(Pageable pageable, Long categoryId, String search);
 
     NgoResponse getById(Long id);
 

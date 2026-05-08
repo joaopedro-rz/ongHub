@@ -36,6 +36,14 @@ public class Ngo {
 
     private String email;
 
+    private String logoUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String socialLinks;
+
+    @Column(columnDefinition = "TEXT")
+    private String certifications;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private NgoStatus status = NgoStatus.PENDING;

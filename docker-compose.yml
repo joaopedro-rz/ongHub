@@ -31,6 +31,10 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       APP_BASE_URL: ${APP_BASE_URL}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
+      FILES_PUBLIC_BASE_URL: ${FILES_PUBLIC_BASE_URL:-http://localhost/api/v1/files}
+    volumes:
+      - uploads_data:/data/uploads
     ports:
       - "8080:8080"
     depends_on:
@@ -57,5 +61,34 @@ services:
       - frontend
       - backend
 
+  db_backup:
+    image: postgres:15-alpine
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-86400}
+    volumes:
+      - postgres_backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo "db_backup: dumping $$POSTGRES_DB every $$BACKUP_INTERVAL_SECONDS s"
+        while true; do
+          TS=$$(date +%Y%m%d_%H%M%S)
+          if pg_dump -h db -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -F c -f "/backups/onghub_$$TS.dump"; then
+            echo "db_backup ok $$TS"
+          else
+            echo "db_backup failed $$TS"
+          fi
+          sleep "$$BACKUP_INTERVAL_SECONDS"
+        done
+
 volumes:
   postgres_data:
+  uploads_data:
+  postgres_backups:

@@ -10,9 +10,11 @@ import com.onghub.api.mapper.NgoMapper;
 import com.onghub.api.repository.NgoCategoryRepository;
 import com.onghub.api.repository.NgoRepository;
 import com.onghub.api.repository.UserRepository;
+import com.onghub.api.repository.spec.NgoSpecifications;
 import com.onghub.api.service.NgoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +51,9 @@ public class NgoServiceImpl implements NgoService {
         ngo.setPhone(request.phone());
         ngo.setWebsite(request.website());
         ngo.setEmail(request.email());
+        ngo.setLogoUrl(request.logoUrl());
+        ngo.setSocialLinks(request.socialLinks());
+        ngo.setCertifications(request.certifications());
         ngo.setStatus(NgoStatus.PENDING);
         ngo.setManager(manager);
 
@@ -72,16 +77,25 @@ public class NgoServiceImpl implements NgoService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NgoSummaryResponse> list(Pageable pageable, String managerEmail, NgoStatus status) {
-        Page<Ngo> page;
+    public Page<NgoSummaryResponse> list(Pageable pageable, String managerEmail, NgoStatus status, Long categoryId, String search) {
+        Specification<Ngo> spec = (root, query, cb) -> cb.conjunction();
         if (managerEmail != null && !managerEmail.isBlank()) {
-            page = ngoRepository.findByManagerEmail(managerEmail, pageable);
-        } else if (status != null) {
-            page = ngoRepository.findByStatus(status, pageable);
-        } else {
-            page = ngoRepository.findAll(pageable);
+            String email = managerEmail.toLowerCase();
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("manager").get("email"), email));
         }
-        return page.map(ngoMapper::toSummary);
+        spec = spec.and(NgoSpecifications.hasStatus(status))
+            .and(NgoSpecifications.hasCategoryId(categoryId))
+            .and(NgoSpecifications.search(search));
+        return ngoRepository.findAll(spec, pageable).map(ngoMapper::toSummary);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<NgoSummaryResponse> listPublic(Pageable pageable, Long categoryId, String search) {
+        Specification<Ngo> spec = NgoSpecifications.hasStatus(NgoStatus.ACTIVE)
+            .and(NgoSpecifications.hasCategoryId(categoryId))
+            .and(NgoSpecifications.search(search));
+        return ngoRepository.findAll(spec, pageable).map(ngoMapper::toSummary);
     }
 
     @Override
@@ -108,6 +122,9 @@ public class NgoServiceImpl implements NgoService {
         if (request.phone() != null) ngo.setPhone(request.phone());
         if (request.website() != null) ngo.setWebsite(request.website());
         if (request.email() != null) ngo.setEmail(request.email());
+        if (request.logoUrl() != null) ngo.setLogoUrl(request.logoUrl());
+        if (request.socialLinks() != null) ngo.setSocialLinks(request.socialLinks());
+        if (request.certifications() != null) ngo.setCertifications(request.certifications());
 
         if (request.categoryId() != null) {
             NgoCategory category = ngoCategoryRepository.findById(request.categoryId())

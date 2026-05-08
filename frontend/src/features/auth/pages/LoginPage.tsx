@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { AuthLayout } from '../../../components/shared/AuthLayout'
 import { Button } from '../../../components/ui/Button'
@@ -17,6 +18,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 export function LoginPage() {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -30,6 +32,7 @@ export function LoginPage() {
     mutationFn: authApi.login,
     onSuccess: () => {
       showToast('success', 'Login realizado com sucesso')
+      navigate('/app', { replace: true })
     },
     onError: (error: unknown) => {
       const applied = applyApiFieldErrors<FormValues>(error, setError)
